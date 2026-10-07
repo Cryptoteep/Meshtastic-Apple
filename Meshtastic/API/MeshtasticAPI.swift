@@ -41,6 +41,7 @@ private struct DeviceHardware: Codable {
 	let activelySupported: Bool
 	let displayName: String
 	let supportLevel: Int?
+	let isMaker: Bool?
 	let tags: [String]?
 	let images: [String]?
 	let requiresDfu: Bool?
@@ -409,6 +410,7 @@ deviceEntity.architecture = device.architecture
 				deviceEntity.activelySupported = device.activelySupported
 				deviceEntity.displayName = device.displayName
 				deviceEntity.supportLevel = device.supportLevel ?? 0
+				deviceEntity.isMaker = device.isMaker ?? false
 				deviceEntity.requiresDfu = device.requiresDfu ?? false
 				deviceEntity.hasInkHud = device.hasInkHud ?? false
 				deviceEntity.partitionScheme = device.partitionScheme
@@ -420,7 +422,7 @@ deviceEntity.architecture = device.architecture
 				var tags = [DeviceHardwareTagEntity]()
 				if let tagList = device.tags {
 					for tagString in tagList {
-						if let tagEntity = try? Self.findOrCreateTag(tag: tagString, context: context) {
+						if let tagEntity = try? Self.findOrCreateTag(tagName: tagString, context: context) {
 							tags.append(tagEntity)
 						}
 					}
@@ -730,9 +732,9 @@ deviceEntity.architecture = device.architecture
 
 	// MARK: - Helpers
 	
-	private static func findOrCreateTag(tag: String, context: ModelContext) throws -> DeviceHardwareTagEntity {
+	private static func findOrCreateTag(tagName: String, context: ModelContext) throws -> DeviceHardwareTagEntity {
 		var descriptor = FetchDescriptor<DeviceHardwareTagEntity>(
-			predicate: #Predicate { $0.tag == tag }
+			predicate: #Predicate { $0.tag == tagName }
 		)
 		descriptor.fetchLimit = 1
 		
@@ -801,6 +803,7 @@ extension MeshtasticAPI {
 				deviceEntity.activelySupported = device.activelySupported
 				deviceEntity.displayName = device.displayName
 				deviceEntity.supportLevel = device.supportLevel ?? 0
+				deviceEntity.isMaker = device.isMaker ?? false
 				deviceEntity.requiresDfu = device.requiresDfu ?? false
 				deviceEntity.hasInkHud = device.hasInkHud ?? false
 				deviceEntity.partitionScheme = device.partitionScheme
@@ -810,7 +813,7 @@ extension MeshtasticAPI {
 				var tags = [DeviceHardwareTagEntity]()
 				if let tagList = device.tags {
 					for tagString in tagList {
-						if let tagEntity = try? Self.findOrCreateTag(tag: tagString, context: context) {
+						if let tagEntity = try? Self.findOrCreateTag(tagName: tagString, context: context) {
 							tags.append(tagEntity)
 						}
 					}

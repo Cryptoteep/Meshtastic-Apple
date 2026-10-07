@@ -22,6 +22,7 @@ final class DeviceHardwareEntity {
 	var platformioTarget: String?
 	var requiresDfu: Bool = false
 	var supportLevel: Int = 0
+	var isMaker: Bool = false
 	var variant: String?
 
 	@Relationship(deleteRule: .nullify, inverse: \DeviceHardwareImageEntity.device)
@@ -44,7 +45,9 @@ struct HardwareCatalogRecord: Equatable {
 	let displayName: String?
 	let activelySupported: Bool
 	let supportLevel: SupportLevel
+	let isMaker: Bool
 	let architecture: String?
+	let tags: [String]
 
 	init(
 		hwModel: Int64,
@@ -53,7 +56,9 @@ struct HardwareCatalogRecord: Equatable {
 		displayName: String?,
 		activelySupported: Bool,
 		supportLevel: SupportLevel,
-		architecture: String? = nil
+		isMaker: Bool = false,
+		architecture: String? = nil,
+		tags: [String] = []
 	) {
 		self.hwModel = hwModel
 		self.hwModelSlug = hwModelSlug
@@ -61,7 +66,9 @@ struct HardwareCatalogRecord: Equatable {
 		self.displayName = displayName
 		self.activelySupported = activelySupported
 		self.supportLevel = supportLevel
+		self.isMaker = isMaker
 		self.architecture = architecture
+		self.tags = tags
 	}
 
 	init(_ entity: DeviceHardwareEntity) {
@@ -72,7 +79,9 @@ struct HardwareCatalogRecord: Equatable {
 			displayName: entity.displayName,
 			activelySupported: entity.activelySupported,
 			supportLevel: SupportLevel(rawValue: entity.supportLevel) ?? .discontinued,
-			architecture: entity.architecture
+			isMaker: entity.isMaker,
+			architecture: entity.architecture,
+			tags: entity.tags.compactMap { $0.tag }
 		)
 	}
 }
@@ -85,7 +94,9 @@ struct HardwareCatalogPresentation: Equatable {
 	let platformioTarget: String?
 	let activelySupported: Bool?
 	let supportLevel: SupportLevel?
+	let isMaker: Bool?
 	let architecture: String?
+	let tags: [String]?
 }
 
 enum HardwareCatalogResolver {
@@ -126,7 +137,9 @@ enum HardwareCatalogResolver {
 			platformioTarget: record.platformioTarget,
 			activelySupported: record.activelySupported,
 			supportLevel: record.supportLevel,
-			architecture: record.architecture
+			isMaker: record.isMaker,
+			architecture: record.architecture,
+			tags: record.tags
 		)
 	}
 
